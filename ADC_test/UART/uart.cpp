@@ -8,10 +8,11 @@
 #include "../buffer/buffer.h"
 
 u8buf tx_buffer;
+uint16_t baud_rate;
 
-void USART_Init()
+void USART_Init(uint16_t baudRate)
 {
-
+	baud_rate = baudRate;
 	// Set Baud Rate
 	UBRR0H = BAUD_PRESCALER >> 8;
 	UBRR0L = BAUD_PRESCALER;
@@ -34,6 +35,25 @@ void USART_TransmitInterrupt(u8buf *Buffer)
 	UCSR0B |= DATA_REGISTER_EMPTY_INTERRUPT; // Enables the Interrupt
 	//Enable Global Interrupts
 	sei();
+}
+
+void USART_TransmitPolling(u8buf *Buffer)
+{
+	
+   uint8_t data;
+   while(!BufferRead(Buffer,&data)){
+		while (( UCSR0A & (1<<UDRE0)) == 0) {}; // Do nothing until UDR is ready
+		UDR0 = data;
+   }
+   
+}
+
+void print_string_pooling(char string_tx [],uint16_t data_length){
+	
+	u8buf my_buffer;
+	BufferMultipleWrite(&my_buffer,string_tx,data_length);
+	USART_TransmitPolling(&my_buffer);
+	
 }
 
 

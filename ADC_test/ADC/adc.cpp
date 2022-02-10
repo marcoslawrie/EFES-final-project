@@ -5,22 +5,23 @@
  *  Author: Marcos
  */ 
 #include "adc.h"
+#include "../UART/uart.h" //Borrar esto
 uint16_t *adcResult;
+extern volatile uint8_t flag;
+extern volatile uint16_t counter;
 
 void InitADC(uint16_t *presult)
 {
-	// Select Vref=AVcc
-	//and set left adjust result
-	ADMUX |= (1<<REFS0)|(1<<ADLAR);
-	//set prescaller to 32
-	//enable autotriggering
-	//enable ADC interupt
-	//and enable ADC
-	ADCSRA |= (1<<ADPS2)|(1<<ADPS0)|(1<<ADATE)|(1<<ADIE)|(1<<ADEN);
-	//set ADC trigger source - Timer0 compare match A
-	//ADCSRB |= (1<<ADTS1)|(1<<ADTS0);
-	//set ADC trigger source - Timer1 compare match B
-	ADCSRB |= (1<<ADTS2)|(1<<ADTS0);
+ // Select Vref=AVcc
+ //and set left adjust result
+ ADMUX |= (1<<REFS0)|(1<<ADLAR);
+ //set prescaller to 32
+ //enable autotriggering
+ //enable ADC interupt
+ //and enable ADC
+ ADCSRA |= (1<<ADPS2)|(1<<ADPS0)|(1<<ADATE)|(1<<ADIE)|(1<<ADEN);
+ //set ADC trigger source - Timer0 compare match A
+ ADCSRB |= (1<<ADTS1)|(1<<ADTS0);
 	adcResult = presult;
 }
 void SetADCChannel(uint8_t ADCchannel)
@@ -40,10 +41,19 @@ void DisableADC(void)
 //ADC conversion complete ISR
 ISR(ADC_vect)
 {
+
 	//clear timer compare match flag
 	TIFR0=(1<<OCF0A);
+	counter++;
 	//toggle pin PD2 to track the end of ADC conversion
 	//PIND = (1<<PD2);
-	*adcResult = ADCH;
+	if(counter == 100){
+				
+		*adcResult = ADCH;
+		flag = 1;
+		counter = 0;	
+	}
+
+	
 
 }

@@ -12,7 +12,7 @@
 #include "../buffer/buffer.h"
 #define F_CPU 16000000UL // Defining the CPU Frequency
 
-#define USART_BAUDRATE 9600 // Desired Baud Rate
+#define USART_BAUDRATE baud_rate // Desired Baud Rate
 #define BAUD_PRESCALER (((F_CPU / (USART_BAUDRATE * 16UL))) - 1)
 
 #define ASYNCHRONOUS (0<<UMSEL00) // USART Mode Selection
@@ -37,8 +37,11 @@
 
 
 
-void USART_Init();
+void USART_Init(uint16_t baudRate);
 void USART_TransmitInterrupt(u8buf *);
+void USART_TransmitPolling(u8buf *Buffer);
+void print_string_pooling(char string_tx [],uint16_t data_length);
+
 ISR(USART_UDRE_vect);
 
 
