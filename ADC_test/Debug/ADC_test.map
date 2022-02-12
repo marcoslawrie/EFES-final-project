@@ -34,8 +34,6 @@ Discarded input sections
  .bss           0x00000000        0x0 main.o
  .bss.my_buffer
                 0x00000000       0x15 main.o
- .bss.ii        0x00000000        0x1 main.o
- .bss.wave      0x00000000       0x14 main.o
  .text          0x00000000        0x0 misc/format_converter.o
  .data          0x00000000        0x0 misc/format_converter.o
  .bss           0x00000000        0x0 misc/format_converter.o
@@ -550,23 +548,23 @@ END GROUP
 .debug_pubnames
  *(.debug_pubnames)
 
-.debug_info     0x00000000      0xc60
+.debug_info     0x00000000      0xc36
  *(.debug_info .gnu.linkonce.wi.*)
- .debug_info    0x00000000      0x15f adc/adc.o
- .debug_info    0x0000015f      0x228 buffer/buffer_lib.o
- .debug_info    0x00000387      0x397 main.o
- .debug_info    0x0000071e      0x19d misc/format_converter.o
- .debug_info    0x000008bb       0xad timer0/timer0.o
- .debug_info    0x00000968      0x2f8 uart/uart.o
+ .debug_info    0x00000000      0x158 adc/adc.o
+ .debug_info    0x00000158      0x228 buffer/buffer_lib.o
+ .debug_info    0x00000380      0x374 main.o
+ .debug_info    0x000006f4      0x19d misc/format_converter.o
+ .debug_info    0x00000891       0xad timer0/timer0.o
+ .debug_info    0x0000093e      0x2f8 uart/uart.o
 
-.debug_abbrev   0x00000000      0x62d
+.debug_abbrev   0x00000000      0x61c
  *(.debug_abbrev)
  .debug_abbrev  0x00000000       0xd3 adc/adc.o
  .debug_abbrev  0x000000d3      0x14e buffer/buffer_lib.o
- .debug_abbrev  0x00000221      0x16b main.o
- .debug_abbrev  0x0000038c      0x107 misc/format_converter.o
- .debug_abbrev  0x00000493       0x45 timer0/timer0.o
- .debug_abbrev  0x000004d8      0x155 uart/uart.o
+ .debug_abbrev  0x00000221      0x15a main.o
+ .debug_abbrev  0x0000037b      0x107 misc/format_converter.o
+ .debug_abbrev  0x00000482       0x45 timer0/timer0.o
+ .debug_abbrev  0x000004c7      0x155 uart/uart.o
 
 .debug_line     0x00000000      0x773
  *(.debug_line .debug_line.* .debug_line_end)
@@ -586,19 +584,19 @@ END GROUP
  .debug_frame   0x00000178       0x44 timer0/timer0.o
  .debug_frame   0x000001bc      0x110 uart/uart.o
 
-.debug_str      0x00000000      0x589
+.debug_str      0x00000000      0x584
  *(.debug_str)
- .debug_str     0x00000000      0x258 adc/adc.o
-                                0x28c (size before relaxing)
- .debug_str     0x00000258       0xdc buffer/buffer_lib.o
+ .debug_str     0x00000000      0x24f adc/adc.o
+                                0x283 (size before relaxing)
+ .debug_str     0x0000024f       0xe5 buffer/buffer_lib.o
                                 0x2d3 (size before relaxing)
- .debug_str     0x00000334      0x139 main.o
-                                0x3ce (size before relaxing)
- .debug_str     0x0000046d       0x61 misc/format_converter.o
+ .debug_str     0x00000334      0x134 main.o
+                                0x3c9 (size before relaxing)
+ .debug_str     0x00000468       0x61 misc/format_converter.o
                                 0x259 (size before relaxing)
- .debug_str     0x000004ce       0x2d timer0/timer0.o
+ .debug_str     0x000004c9       0x2d timer0/timer0.o
                                 0x22b (size before relaxing)
- .debug_str     0x000004fb       0x8e uart/uart.o
+ .debug_str     0x000004f6       0x8e uart/uart.o
                                 0x384 (size before relaxing)
 
 .debug_loc      0x00000000      0x6d0

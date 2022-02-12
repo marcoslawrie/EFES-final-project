@@ -15,19 +15,19 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY
   5 .debug_aranges 00000130  00000000  00000000  00000698  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_info   00000c60  00000000  00000000  000007c8  2**0
+  6 .debug_info   00000c36  00000000  00000000  000007c8  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_abbrev 0000062d  00000000  00000000  00001428  2**0
+  7 .debug_abbrev 0000061c  00000000  00000000  000013fe  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_line   00000773  00000000  00000000  00001a55  2**0
+  8 .debug_line   00000773  00000000  00000000  00001a1a  2**0
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_frame  000002cc  00000000  00000000  000021c8  2**2
+  9 .debug_frame  000002cc  00000000  00000000  00002190  2**2
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_str    00000589  00000000  00000000  00002494  2**0
+ 10 .debug_str    00000584  00000000  00000000  0000245c  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_loc    000006d0  00000000  00000000  00002a1d  2**0
+ 11 .debug_loc    000006d0  00000000  00000000  000029e0  2**0
                   CONTENTS, READONLY, DEBUGGING
- 12 .debug_ranges 000000d0  00000000  00000000  000030ed  2**0
+ 12 .debug_ranges 000000d0  00000000  00000000  000030b0  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -432,8 +432,8 @@ int main()
  226:	e1 f3       	breq	.-8      	; 0x220 <main+0x3c>
 		{
 			
-			
-			print_string_pooling("ADC values\n",11);
+			//Printing message 
+			print_string_pooling("ADC values\n",11); //Printing using polling
  228:	6b e0       	ldi	r22, 0x0B	; 11
  22a:	70 e0       	ldi	r23, 0x00	; 0
  22c:	80 e0       	ldi	r24, 0x00	; 0
@@ -441,8 +441,8 @@ int main()
  230:	0e 94 11 02 	call	0x422	; 0x422 <_Z20print_string_poolingPcj>
 			
 			
-		
-			int2str4dig(convertionResult,value,1);
+			//Printing result of the conversion 
+			int2str4dig(convertionResult,value,1); //First we need to transform the int values to an array of chars
  234:	41 e0       	ldi	r20, 0x01	; 1
  236:	be 01       	movw	r22, r28
  238:	6a 5e       	subi	r22, 0xEA	; 234
@@ -450,7 +450,7 @@ int main()
  23c:	8b 8d       	ldd	r24, Y+27	; 0x1b
  23e:	9c 8d       	ldd	r25, Y+28	; 0x1c
  240:	0e 94 31 01 	call	0x262	; 0x262 <_Z11int2str4digiPch>
-			BufferMultipleWrite(&my_buffer2,value,5);
+			BufferMultipleWrite(&my_buffer2,value,5); 
  244:	45 e0       	ldi	r20, 0x05	; 5
  246:	be 01       	movw	r22, r28
  248:	6a 5e       	subi	r22, 0xEA	; 234
@@ -458,7 +458,7 @@ int main()
  24c:	ce 01       	movw	r24, r28
  24e:	01 96       	adiw	r24, 0x01	; 1
  250:	0e 94 b9 00 	call	0x172	; 0x172 <_Z19BufferMultipleWriteP5u8bufPca>
-			USART_TransmitInterrupt(&my_buffer2);
+			USART_TransmitInterrupt(&my_buffer2); //Using UART with interrupts
  254:	ce 01       	movw	r24, r28
  256:	01 96       	adiw	r24, 0x01	; 1
  258:	0e 94 d0 01 	call	0x3a0	; 0x3a0 <_Z23USART_TransmitInterruptP5u8buf>

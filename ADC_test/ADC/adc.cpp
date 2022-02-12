@@ -5,7 +5,7 @@
  *  Author: Marcos
  */ 
 #include "adc.h"
-#include "../UART/uart.h" //Borrar esto
+
 uint16_t *adcResult;
 extern volatile uint8_t flag;
 extern volatile uint16_t counter;
