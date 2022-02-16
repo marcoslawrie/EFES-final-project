@@ -36,7 +36,7 @@ int main(void)
 	
 	
 	
-	fastPWMStart();
+	fastPWMStart_T1();
 	timer2Init();
 	timer2SetIntOnMatch();
 	

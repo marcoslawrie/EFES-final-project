@@ -10,6 +10,6 @@
 #ifndef TIMER1_H_
 #define TIMER1_H_
 
-void fastPWMStart(void);
+void fastPWMStart_T1(void);
 
 #endif /* TIMER1_H_ */

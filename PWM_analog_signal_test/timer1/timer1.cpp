@@ -7,7 +7,7 @@
 #include "timer1.h"
 
 /****Set timer1 for 8-bit fast PWM output ****/
-void fastPWMStart(void){
+void fastPWMStart_T1(void){
 	
 	// Set PB1 to be an output (Pin9 Arduino UNO)
 	DDRB |= (1 << DDB1);
