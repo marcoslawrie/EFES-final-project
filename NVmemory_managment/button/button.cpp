@@ -51,6 +51,8 @@ ISR (PCINT0_vect){
 		count_timer0++;
 		timer0CTCInit(1024, 250);
 		
+		
+		
 	}
 	else{
 		//print_string_pooling("Bounce\n",7); DEBUG
@@ -67,11 +69,15 @@ ISR( INT1_vect ){ //start filtering in this interrupt
 		print_string_pooling("aaa\n",4);// DEBUG
 		count_timer0++;
 		timer0CTCInit(1024, 250);
+		//GENERATE DATA, and save it in memory
+		
+		//Initialize port and filter data		
 		DisableADC();
 		parallelPortInit();
 		portClockInit();
+		//Save data in memory
 		
-		//SINGLE READ OF ADC and INIT POWER PWM
+		
 	}
 	else{
 		//print_string_pooling("Bounce\n",7); DEBUG
