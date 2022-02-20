@@ -29,7 +29,7 @@
 
 /******** Sine wave parameters ********/
 #define PI2 6.283185 // 2*PI saves calculation later
-#define AMP 127 // Scaling factor for sine wave
+#define AMP 31 // Scaling factor for sine wave (we use 6 bits to represent the sine wave)
 #define OFFSET 128 // Offset shifts wave to all >0 values
 
 #define LENGTH 15 // Length of the wave lookup table
@@ -42,9 +42,20 @@ volatile uint16_t count_timer0 = 0;
 volatile uint16_t PWM_duty_cycle = 0;
 volatile uint8_t flag=0;
 
+extern uint8_t data_in_array[];
 
-uint8_t EEPROM_update_batch(uint16_t uiAddress, void *data,uint16_t len);
-uint8_t EEPROM_read_batch(uint16_t uiAddress, void *data,uint16_t len);
+/*
+	First I have to generate the wave and also save it in the memory
+	*I need 1 global array to save the values
+	Use this arrays with the values to transmit the data and at the same time save the input values (in order to save memory)
+	Things to take care:
+	-- Number of samples (fs = 10*fmax)
+	-- Which are the first values that should be filter (circular convolution)
+	-- When should I start sampling the data, in order to save a complete cycle of the filterer signal.
+	-- All this three things, see them in matlab
+	
+	
+*/
 
 int main(void)
 {
@@ -78,6 +89,14 @@ int main(void)
 	
     while (1) 
     {
+		if(flag){
+			for(int i = 0 ; i<7;i++){
+				int2str4dig(data_in_array[i],value,1); //DEBUG
+				BufferMultipleWrite(&my_buffer2,value,5);// DEBUG
+				USART_TransmitInterrupt(&my_buffer2); //Using UART with interrupts
+				flag = 0;
+			}
+		}
 		
     }
 }

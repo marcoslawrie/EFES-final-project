@@ -12,7 +12,7 @@ uint16_t baud_rate;
 
 void USART_Init(uint16_t baudRate)
 {
-	baud_rate = baudRate;
+	baud_rate = baudRate; //The value of baud_rate is then use in the macro BAUD_PRESCALER
 	// Set Baud Rate
 	UBRR0H = BAUD_PRESCALER >> 8;
 	UBRR0L = BAUD_PRESCALER;
@@ -21,7 +21,10 @@ void USART_Init(uint16_t baudRate)
 	UCSR0C = ASYNCHRONOUS | PARITY_MODE | STOP_BIT | DATA_BIT;
 	
 	// Enable Receiver and Transmitter
-	UCSR0B = (1<<RXEN0) | (1<<TXEN0);
+	//UCSR0B = (1<<RXEN0) | (1<<TXEN0);
+	
+	//Enable only Transmitter
+	UCSR0B = (1<<TXEN0);
 	
 	//Enable Global Interrupts
 	sei();

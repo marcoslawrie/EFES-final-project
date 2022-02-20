@@ -66,7 +66,7 @@ ISR (PCINT0_vect){
 ISR( INT1_vect ){ //start filtering in this interrupt
 	print_string_pooling("INT1 ISR\n",9);//DEBUG
 	if( count_timer0 == 0){ //count_timer0>55 ||
-		print_string_pooling("aaa\n",4);// DEBUG
+		//print_string_pooling("aaa\n",4);// DEBUG
 		count_timer0++;
 		timer0CTCInit(1024, 250);
 		//GENERATE DATA, and save it in memory

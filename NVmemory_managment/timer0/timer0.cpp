@@ -11,7 +11,7 @@ extern uint16_t count_timer0;
 //initialize timer0
 void timer0CTCInit(uint16_t prescaler, uint16_t match_value){
 	
-	//print_string_pooling("Timer0 start conf\n",18); DEBUG LINE
+	//print_string_pooling("Timer0 start conf\n",18); //##DEBUG LINE
 	TCCR0B &= 0xF0; //clearing previous prescaler configuration and clearing WGM02
 	
 	switch(prescaler){
@@ -80,7 +80,7 @@ ISR(TIMER0_COMPA_vect) {
 	
 	count_timer0++;
 	if(count_timer0>20){
-		print_string_pooling("restart counter\n",16); //DEBUG LINE
+		//print_string_pooling("restart counter\n",16); //DEBUG LINE
 		count_timer0 = 0;
 		StopTimer0();
 	}
