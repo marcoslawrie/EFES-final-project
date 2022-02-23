@@ -9,7 +9,7 @@
 #ifndef BUFFER_H_
 #define BUFFER_H_
 
-#define BUF_SIZE 20
+#define BUF_SIZE 50
 
 //type definition of buffer structure
 

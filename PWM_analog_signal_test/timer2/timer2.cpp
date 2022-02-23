@@ -26,7 +26,7 @@ void setTOPValue(uint8_t top){
 }
 
 ISR(TIMER2_COMPA_vect) { // Called when TCNT2 == OCR2A
-	static uint8_t index=0; // Points to each table entry
+	static uint8_t index=0; // Points to each table entry. WE DONT NEED TO RESET THE VALUE OF INDEX BECAUSE IT IS An 8 BIT VARIABLE AND WAVE HAS 256 ELEMENTS
 	OCR1AL = wave[index++]; // Update the PWM output
 	asm("NOP;NOP"); // Fine tuning
 	TCNT2 = 6; // Timing to compensate for ISR run time

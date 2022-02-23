@@ -7,14 +7,15 @@
 
 #include "../UART/uart.h"
 #include "parallel_port.h"
+#include "../incfile.h"
 
-#define communication_length 50 //number of clock cycles that the communication should last 
+//#define communication_length 50 //number of clock cycles that the communication should last 
 static uint16_t clk_cycle = 0; //variable to save the current clock cycle, in order to know when to set the reset pin and when to start transmitting data
-uint8_t data_out_array[] = {0b000000,0b001001,0b010010,0b011011,0b100100,0b101101,0b110110};
-uint8_t data_in_array[] = {0,0,0,0,0,0,0};
+
 	
 	
 extern volatile uint8_t flag;
+extern uint8_t wave_samples[];
 
 void parallelPortInit(){
 	/////////**** setup input parallel port ****///////////////// PC1,PC2,PC3,PC4,PC5,PB5
@@ -59,21 +60,48 @@ void portClockInit(){ //Pin with the signal clock 10 (OC1B)
 
 ISR(TIMER1_COMPB_vect){
 	//print_string_pooling("int/n",4);
-	uint8_t *data_out = data_out_array;
-	uint8_t *data_in = data_in_array;
+	//uint8_t *data_out = data_out_array;
+	///uint8_t *data_in = data_in_array;
 	//flag = 0;
 	if(!(PINB & (1 << PINB2))){ //see if the edge was a negative to change the outputs and read the inputs (read in the middle of a clock cycle)
 		if(clk_cycle < 1){ //The first cycle we set the reset signal
 			PORTD |=  ( 1UL << DDD0 );     /// reset = '1'
 			clk_cycle++;
 		}
-		else if(clk_cycle >= 1 && clk_cycle <8){// communication_length){ //after the first clock cycle we start sending data and reading data
-			//PINB = (1<<PINB1); 
-			PORTD = (PORTD&0x0E) | ((*(data_out+clk_cycle-1) & 0x0F)<<4);//out a value MSB[PB4, PB1, PD7, PD6, PD5, PD4]LSB, Here I also assure that reset = '0'
-			PORTB = (PORTB & 0xED) | ((*(data_out+clk_cycle-1) & 0x10)>>3) | ((*(data_out+clk_cycle-1) & 0x20)>>1); //(data_out & 0x20)= MSB of the data out, (data_out & 0x10)=MSB-1 of the data out
-							   
-			//PORTD &=  ~( 1UL << DDD0 );     /// reset = '0'
-			*(data_in + clk_cycle-1) = (PINB & 0x20) | ((PINC & 0x3E)>>1);//read an input value MSB[PB5, PC5, PC4, PC3, PC2, PC1]LSB
+		/*
+		*	After the first clock cycle we start sending data and reading data.
+		*	The first N_taps+Pipeline_Depth cycles we don't read data because the 
+		*	values in the filter are all 0s and there is a delay in the data output
+		*	due to the pipeline architecture of the filter
+		*/
+		else if(clk_cycle>=N_TAPS+PIPELINE_DEPTH && clk_cycle < WAVE_SAMPLES_LENGTH+N_TAPS){ 
+			
+			PORTD = (PORTD&0x0E) | ((wave_samples[clk_cycle-1] & 0x0F)<<4);//out a value MSB[PB4, PB1, PD7, PD6, PD5, PD4]LSB, Here I also assure that reset = '0'
+			PORTB = (PORTB & 0xED) | ((wave_samples[clk_cycle-1] & 0x10)>>3) | ((wave_samples[clk_cycle-1] & 0x20)>>1); //(data_out & 0x20)= MSB of the data out, (data_out & 0x10)=MSB-1 of the data out	
+			wave_samples[clk_cycle-1-(N_TAPS+PIPELINE_DEPTH)] = (PINB & 0x20) | ((PINC & 0x3E)>>1);//read an input value MSB[PB5, PC5, PC4, PC3, PC2, PC1]LSB
+			clk_cycle++;				   
+		}
+		/*
+		* We first have to fill the filter with N_TAPS samples and wait PIPELINE_DEPTH 
+		* cycles to then start saving data, so the first N_TAPS+PIPELINE_DEPTH input 
+		* values has to be ignored 
+		*/
+		else if(clk_cycle >= 1 && clk_cycle <N_TAPS+PIPELINE_DEPTH){
+			
+			PORTD = (PORTD&0x0E) | ((wave_samples[clk_cycle-1] & 0x0F)<<4);//out a value MSB[PB4, PB1, PD7, PD6, PD5, PD4]LSB, Here I also assure that reset = '0'
+			PORTB = (PORTB & 0xED) | ((wave_samples[clk_cycle-1] & 0x10)>>3) | ((wave_samples[clk_cycle-1] & 0x20)>>1); //(data_out & 0x20)= MSB of the data out, (data_out & 0x10)=MSB-1 of the data out
+			clk_cycle++;				   
+			
+			
+			
+		}
+		/*
+		* We have already sent all the data, we only have to read the last PIPELINE_DEPTH output values 
+		* We don't have to send any more data
+		*/
+		else if(clk_cycle>=WAVE_SAMPLES_LENGTH+N_TAPS && clk_cycle < WAVE_SAMPLES_LENGTH+N_TAPS+PIPELINE_DEPTH){
+			
+			wave_samples[clk_cycle-1-(N_TAPS+PIPELINE_DEPTH)] = (PINB & 0x20) | ((PINC & 0x3E)>>1);//read an input value MSB[PB5, PC5, PC4, PC3, PC2, PC1]LSB
 			clk_cycle++;
 		}
 		else{ 

@@ -6,15 +6,17 @@
  */ 
 
 #include "timer2.h"
-extern uint8_t wave[];
+#include "../incfile.h"
+extern volatile uint8_t wave_samples[WAVE_SAMPLES_LENGTH];
+static uint16_t index=0; // pointer to the different entries of the array
 
 
 void timer2Init(){
 	/******** Set up timer2 to call ISR ********/
 	TCCR2A = 0; // No options in control register A
 	TCCR2B = (1 << CS21); // Set prescaler to divide by 8
-	OCR2A = 32; // Set frequency of generated wave
-	
+	//OCR2A = 32; // Set frequency of generated wave
+	OCR2A = 250; // Set frequency of generated wave
 }
 void fastPWMStart_T2(){
 	
@@ -37,8 +39,15 @@ void setTOPValue(uint8_t top){
 }
 
 ISR(TIMER2_COMPA_vect) { // Called when TCNT2 == OCR2A
+	
+	
+	
+	OCR1AL = wave_samples[index++]; // Update the PWM output
+	TCNT2 = 6; // Timing to compensate for ISR run time
+	if(index == N_SAMPLES) index = 0;
+	
 /*	static uint8_t index=0; // Points to each table entry
 	OCR1AL = wave[index++]; // Update the PWM output
-	asm("NOP;NOP"); // Fine tuning
-	TCNT2 = 6; // Timing to compensate for ISR run time*/
+	asm("NOP;NOP"); // Fine tuning*/
+	
 }

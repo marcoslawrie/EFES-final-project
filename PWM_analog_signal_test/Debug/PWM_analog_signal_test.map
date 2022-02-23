@@ -448,9 +448,9 @@ END GROUP
                 0x000000ae                _Z10BufferReadP5u8bufPVh
  .text.main     0x000000d0       0xb2 main.o
                 0x000000d0                main
- .text._Z12fastPWMStartv
+ .text._Z15fastPWMStart_T1v
                 0x00000182       0x22 timer1/timer1.o
-                0x00000182                _Z12fastPWMStartv
+                0x00000182                _Z15fastPWMStart_T1v
  .text._Z10timer2Initv
                 0x000001a4       0x12 timer2/timer2.o
                 0x000001a4                _Z10timer2Initv
@@ -704,17 +704,17 @@ END GROUP
  .debug_frame   0x000000b8       0x70 timer2/timer2.o
  .debug_frame   0x00000128      0x110 uart/uart.o
 
-.debug_str      0x00000000      0x493
+.debug_str      0x00000000      0x499
  *(.debug_str)
  .debug_str     0x00000000      0x28d buffer/buffer_lib.o
                                 0x2e1 (size before relaxing)
- .debug_str     0x0000028d       0x8c main.o
-                                0x26e (size before relaxing)
- .debug_str     0x00000319       0x15 timer1/timer1.o
-                                0x208 (size before relaxing)
- .debug_str     0x0000032e       0x3d timer2/timer2.o
+ .debug_str     0x0000028d       0x92 main.o
+                                0x274 (size before relaxing)
+ .debug_str     0x0000031f       0x15 timer1/timer1.o
+                                0x20e (size before relaxing)
+ .debug_str     0x00000334       0x3d timer2/timer2.o
                                 0x26c (size before relaxing)
- .debug_str     0x0000036b      0x128 uart/uart.o
+ .debug_str     0x00000371      0x128 uart/uart.o
                                 0x392 (size before relaxing)
 
 .debug_loc      0x00000000      0x557
