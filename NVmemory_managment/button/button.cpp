@@ -96,14 +96,14 @@ ISR( INT1_vect ){ //Interrupt using PIN 3 (PD3). It starts filtering.
 			//disable interrupts while data is being saved in memory
 			cli();
 			//save it in memory
-			EEPROM_update_batch(TX_SIGNAL_START_ADDRESS, &wave_samples[HALF_N_TAPS],N_SAMPLES);
+			//EEPROM_update_batch(TX_SIGNAL_START_ADDRESS, &wave_samples[HALF_N_TAPS],N_SAMPLES);
 			data_in_memory = 1;
 		}
 		else{
 			print_string_pooling("Data already generated, reading from memory\n",44);
 			//disable interrupts while data is being read from the memory
 			cli();
-			EEPROM_read_batch(TX_SIGNAL_START_ADDRESS, &wave_samples[HALF_N_TAPS],N_SAMPLES);
+			//EEPROM_read_batch(TX_SIGNAL_START_ADDRESS, &wave_samples[HALF_N_TAPS],N_SAMPLES);
 			//Fill the N_TAPS/2 values at the beginning and at the end of the array for the circular convolution
 			for (int i =0 ; i<HALF_N_TAPS ;i++){
 				wave_samples[i] = wave_samples[i+N_SAMPLES];

@@ -25,7 +25,7 @@
 #define WAVE_SAMPLES_LENGTH (N_SAMPLES + N_TAPS - 1)
 #define N_TAPS 9
 #define HALF_N_TAPS 4
-#define PIPELINE_DEPTH 5
+#define PIPELINE_DEPTH 6
 
 
 /******** Sine wave parameters ********/

@@ -8,6 +8,7 @@
 #include "../UART/uart.h"
 #include "parallel_port.h"
 #include "../incfile.h"
+#include "../misc/format_converter.h"
 
 //#define communication_length 50 //number of clock cycles that the communication should last 
 static uint16_t clk_cycle = 0; //variable to save the current clock cycle, in order to know when to set the reset pin and when to start transmitting data
@@ -15,7 +16,7 @@ static uint16_t clk_cycle = 0; //variable to save the current clock cycle, in or
 	
 	
 extern volatile uint8_t flag;
-extern uint8_t wave_samples[];
+extern volatile uint8_t wave_samples[];
 
 void parallelPortInit(){
 	/////////**** setup input parallel port ****///////////////// PC1,PC2,PC3,PC4,PC5,PB5
@@ -32,7 +33,7 @@ void parallelPortInit(){
 	
 	///////**** Reset pin **** ////////////
 	DDRD  |= ( 1UL << DDD0 );     /// Set PD0 output
-	PORTD &=  ~( 1UL << DDD0 );     /// reset = '0'
+	PORTD |=  ( 1UL << DDD0 );     /// reset = '1' (not active)
 	
 }
 
@@ -65,7 +66,7 @@ ISR(TIMER1_COMPB_vect){
 	//flag = 0;
 	if(!(PINB & (1 << PINB2))){ //see if the edge was a negative to change the outputs and read the inputs (read in the middle of a clock cycle)
 		if(clk_cycle < 1){ //The first cycle we set the reset signal
-			PORTD |=  ( 1UL << DDD0 );     /// reset = '1'
+			PORTD &=  ~( 1UL << DDD0 );     /// reset = '0' (reset is active low)
 			clk_cycle++;
 		}
 		/*
@@ -74,23 +75,36 @@ ISR(TIMER1_COMPB_vect){
 		*	values in the filter are all 0s and there is a delay in the data output
 		*	due to the pipeline architecture of the filter
 		*/
-		else if(clk_cycle>=N_TAPS+PIPELINE_DEPTH && clk_cycle < WAVE_SAMPLES_LENGTH+N_TAPS){ 
+		else if(clk_cycle>=N_TAPS+PIPELINE_DEPTH+1 && clk_cycle < WAVE_SAMPLES_LENGTH+N_TAPS){ 
 			
-			PORTD = (PORTD&0x0E) | ((wave_samples[clk_cycle-1] & 0x0F)<<4);//out a value MSB[PB4, PB1, PD7, PD6, PD5, PD4]LSB, Here I also assure that reset = '0'
-			PORTB = (PORTB & 0xED) | ((wave_samples[clk_cycle-1] & 0x10)>>3) | ((wave_samples[clk_cycle-1] & 0x20)>>1); //(data_out & 0x20)= MSB of the data out, (data_out & 0x10)=MSB-1 of the data out	
+			
+			PORTD = ( 1UL << DDD0 ) | (PIND&0x0F) | ((wave_samples[clk_cycle-1] & 0x0F)<<4);//out a value MSB[PB4, PB1, PD7, PD6, PD5, PD4]LSB, Here I also assure that reset = '0'
+			PORTB = (PINB & 0xED) | ((wave_samples[clk_cycle-1] & 0x10)>>3) | ((wave_samples[clk_cycle-1] & 0x20)>>1); //(data_out & 0x20)= MSB of the data out, (data_out & 0x10)=MSB-1 of the data out	
+			//PORTD = ( 1UL << DDD0 )| (PIND ^ 0x80);
+			uint16_t valor = (PINB & 0x20) | ((PINC & 0x3E)>>1);//clk_cycle-1-(N_TAPS+PIPELINE_DEPTH);//read an input value MSB[PB5, PC5, PC4, PC3, PC2, PC1]LSB
+			volatile uint8_t value_sent = ((PINB & 0x10)<<1)|((PINB & 0x02)<<3)|((PIND & 0xF0)>>4);
+			char value[5]; //DEBUG
 			wave_samples[clk_cycle-1-(N_TAPS+PIPELINE_DEPTH)] = (PINB & 0x20) | ((PINC & 0x3E)>>1);//read an input value MSB[PB5, PC5, PC4, PC3, PC2, PC1]LSB
-			clk_cycle++;				   
+			int2str4dig(wave_samples[clk_cycle-1-(N_TAPS+PIPELINE_DEPTH)],value,1); //DEBUG
+			clk_cycle++;
+			print_string_pooling(value,5); //DEBUG
+			
 		}
 		/*
 		* We first have to fill the filter with N_TAPS samples and wait PIPELINE_DEPTH 
 		* cycles to then start saving data, so the first N_TAPS+PIPELINE_DEPTH input 
 		* values has to be ignored 
 		*/
-		else if(clk_cycle >= 1 && clk_cycle <N_TAPS+PIPELINE_DEPTH){
+		else if(clk_cycle >= 1 && clk_cycle <N_TAPS+PIPELINE_DEPTH+1){
 			
-			PORTD = (PORTD&0x0E) | ((wave_samples[clk_cycle-1] & 0x0F)<<4);//out a value MSB[PB4, PB1, PD7, PD6, PD5, PD4]LSB, Here I also assure that reset = '0'
-			PORTB = (PORTB & 0xED) | ((wave_samples[clk_cycle-1] & 0x10)>>3) | ((wave_samples[clk_cycle-1] & 0x20)>>1); //(data_out & 0x20)= MSB of the data out, (data_out & 0x10)=MSB-1 of the data out
+			PORTD = ( 1UL << DDD0 ) | (PIND&0x0F) | ((wave_samples[clk_cycle-1] & 0x0F)<<4);//out a value MSB[PB4, PB1, PD7, PD6, PD5, PD4]LSB, Here I also assure that reset = '0'
+			PORTB = (PINB & 0xED) | ((wave_samples[clk_cycle-1] & 0x10)>>3) | ((wave_samples[clk_cycle-1] & 0x20)>>1); //(data_out & 0x20)= MSB of the data out, (data_out & 0x10)=MSB-1 of the data out
 			clk_cycle++;				   
+			/*
+			char value[5]; //DEBUG
+			volatile uint8_t value_sent = ((PINB & 0x10)<<1)|((PINB & 0x02)<<3)|((PIND & 0xF0)>>4);
+			int2str4dig(value_sent,value,1); //DEBUG
+			print_string_pooling(value,5); //DEBUG*/
 			
 			
 			
@@ -99,18 +113,32 @@ ISR(TIMER1_COMPB_vect){
 		* We have already sent all the data, we only have to read the last PIPELINE_DEPTH output values 
 		* We don't have to send any more data
 		*/
-		else if(clk_cycle>=WAVE_SAMPLES_LENGTH+N_TAPS && clk_cycle < WAVE_SAMPLES_LENGTH+N_TAPS+PIPELINE_DEPTH){
+		else if(clk_cycle>=WAVE_SAMPLES_LENGTH+N_TAPS && clk_cycle < WAVE_SAMPLES_LENGTH+N_TAPS+PIPELINE_DEPTH+1){
 			
 			wave_samples[clk_cycle-1-(N_TAPS+PIPELINE_DEPTH)] = (PINB & 0x20) | ((PINC & 0x3E)>>1);//read an input value MSB[PB5, PC5, PC4, PC3, PC2, PC1]LSB
+			//uint16_t valor = (PINB & 0x20) | ((PINC & 0x3E)>>1);//clk_cycle-1-(N_TAPS+PIPELINE_DEPTH);//read an input value MSB[PB5, PC5, PC4, PC3, PC2, PC1]LSB
+			char value[5]; //DEBUG
+			int2str4dig(wave_samples[clk_cycle-1-(N_TAPS+PIPELINE_DEPTH)],value,1); //DEBUG
 			clk_cycle++;
+			print_string_pooling(value,5); //DEBUG
 		}
 		else{ 
 			TCCR1B = 0; //No clock source-> communication done, disable timer1 
 			clk_cycle = 0;
 			flag = 1;
+			char value[5]; //DEBUG
+			int2str4dig(clk_cycle,value,1); //DEBUG
+			print_string_pooling(value,5); //DEBUG
+			print_string_pooling("aaaaa",5); //DEBUG
 		}
 		
 			
 	}
 	
 }
+
+/*
+* During simulation we see that:
+* Counting the first falling edge when we put the first data, we have 15 falling edge to have a data so, if i = 1 when 
+* we write the first data, i = 16 when we read the first output  data. The delay is 15 (N_taps [9] + Pipeline_deepth [6])
+*/
