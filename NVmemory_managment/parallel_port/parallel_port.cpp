@@ -75,7 +75,7 @@ ISR(TIMER1_COMPB_vect){
 		*	values in the filter are all 0s and there is a delay in the data output
 		*	due to the pipeline architecture of the filter
 		*/
-		else if(clk_cycle>=N_TAPS+PIPELINE_DEPTH+1 && clk_cycle < WAVE_SAMPLES_LENGTH+N_TAPS){ 
+		else if(clk_cycle>=N_TAPS+PIPELINE_DEPTH+1 && clk_cycle < WAVE_SAMPLES_LENGTH){ 
 			
 			
 			PORTD = ( 1UL << DDD0 ) | (PIND&0x0F) | ((wave_samples[clk_cycle-1] & 0x0F)<<4);//out a value MSB[PB4, PB1, PD7, PD6, PD5, PD4]LSB, Here I also assure that reset = '0'
@@ -85,6 +85,7 @@ ISR(TIMER1_COMPB_vect){
 			volatile uint8_t value_sent = ((PINB & 0x10)<<1)|((PINB & 0x02)<<3)|((PIND & 0xF0)>>4);
 			char value[5]; //DEBUG
 			wave_samples[clk_cycle-1-(N_TAPS+PIPELINE_DEPTH)] = (PINB & 0x20) | ((PINC & 0x3E)>>1);//read an input value MSB[PB5, PC5, PC4, PC3, PC2, PC1]LSB
+			//int2str4dig(clk_cycle,value,1); //DEBUG
 			int2str4dig(wave_samples[clk_cycle-1-(N_TAPS+PIPELINE_DEPTH)],value,1); //DEBUG
 			clk_cycle++;
 			print_string_pooling(value,5); //DEBUG
@@ -113,12 +114,13 @@ ISR(TIMER1_COMPB_vect){
 		* We have already sent all the data, we only have to read the last PIPELINE_DEPTH output values 
 		* We don't have to send any more data
 		*/
-		else if(clk_cycle>=WAVE_SAMPLES_LENGTH+N_TAPS && clk_cycle < WAVE_SAMPLES_LENGTH+N_TAPS+PIPELINE_DEPTH+1){
+		else if(clk_cycle>=WAVE_SAMPLES_LENGTH && clk_cycle < WAVE_SAMPLES_LENGTH+PIPELINE_DEPTH+2){
 			
 			wave_samples[clk_cycle-1-(N_TAPS+PIPELINE_DEPTH)] = (PINB & 0x20) | ((PINC & 0x3E)>>1);//read an input value MSB[PB5, PC5, PC4, PC3, PC2, PC1]LSB
 			//uint16_t valor = (PINB & 0x20) | ((PINC & 0x3E)>>1);//clk_cycle-1-(N_TAPS+PIPELINE_DEPTH);//read an input value MSB[PB5, PC5, PC4, PC3, PC2, PC1]LSB
 			char value[5]; //DEBUG
 			int2str4dig(wave_samples[clk_cycle-1-(N_TAPS+PIPELINE_DEPTH)],value,1); //DEBUG
+			//int2str4dig(clk_cycle,value,1); //DEBUG
 			clk_cycle++;
 			print_string_pooling(value,5); //DEBUG
 		}
@@ -126,10 +128,10 @@ ISR(TIMER1_COMPB_vect){
 			TCCR1B = 0; //No clock source-> communication done, disable timer1 
 			clk_cycle = 0;
 			flag = 1;
-			char value[5]; //DEBUG
+			/*char value[5]; //DEBUG
 			int2str4dig(clk_cycle,value,1); //DEBUG
 			print_string_pooling(value,5); //DEBUG
-			print_string_pooling("aaaaa",5); //DEBUG
+			print_string_pooling("aaaaa",5); //DEBUG*/
 		}
 		
 			
