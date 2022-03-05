@@ -151,9 +151,90 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="adc\adc.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="adc\adc.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="buffer\buffer.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="buffer\buffer_lib.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="button\button.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="button\button.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="eeprom\eeprom.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="eeprom\eeprom.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="incfile.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="main.cpp">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="misc\format_converter.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="misc\format_converter.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="misc\signal_generation.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="misc\signal_generation.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="parallel_port\parallel_port.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="parallel_port\parallel_port.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="timer0\timer0.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="timer0\timer0.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="timer1\timer1.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="timer1\timer1.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="timer2\timer2.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="timer2\timer2.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="UART\uart.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="UART\uart.h">
+      <SubType>compile</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="adc" />
+    <Folder Include="buffer" />
+    <Folder Include="button" />
+    <Folder Include="eeprom" />
+    <Folder Include="misc" />
+    <Folder Include="UART" />
+    <Folder Include="timer2" />
+    <Folder Include="timer1" />
+    <Folder Include="timer0" />
+    <Folder Include="parallel_port" />
   </ItemGroup>
   <Import Project="$(AVRSTUDIO_EXE_PATH)\\Vs\\Compiler.targets" />
 </Project>
