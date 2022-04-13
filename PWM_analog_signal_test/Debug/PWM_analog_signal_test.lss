@@ -312,7 +312,7 @@ ISR(TIMER2_COMPA_vect) { // Called when TCNT2 == OCR2A
  1ca:	8f 93       	push	r24
  1cc:	ef 93       	push	r30
  1ce:	ff 93       	push	r31
-	static uint8_t index=0; // Points to each table entry
+	static uint8_t index=0; // Points to each table entry. WE DONT NEED TO RESET THE VALUE OF INDEX BECAUSE IT IS An 8 BIT VARIABLE AND WAVE HAS 256 ELEMENTS
 	OCR1AL = wave[index++]; // Update the PWM output
  1d0:	e0 91 00 02 	lds	r30, 0x0200
  1d4:	81 e0       	ldi	r24, 0x01	; 1

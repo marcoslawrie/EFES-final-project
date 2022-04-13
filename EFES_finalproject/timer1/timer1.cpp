@@ -21,3 +21,7 @@ void fastPWMStart_T1(void){
 	TIMSK1 = 0;
 	
 }
+void disableTimer1(){
+	TCCR1B = 0; // No clock source, timer 1 disable
+	TCCR1A = 0; //Reset timer 1 configuration
+}

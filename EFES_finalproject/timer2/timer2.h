@@ -12,8 +12,11 @@
 #define TIMER2_H_
 
 void timer2Init(void);
+void disableTimer2(void);
 void timer2SetIntOnMatch(void);
+void timer2disableInterrupt(void);
 void fastPWMStart_T2(void);
+void CTCMOdestart_T2(void);
 void setTOPValue(uint8_t top);
 ISR(TIMER2_COMPA_vect);
 

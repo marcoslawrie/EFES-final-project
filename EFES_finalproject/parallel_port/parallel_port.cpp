@@ -10,12 +10,8 @@
 #include "../incfile.h"
 #include "../misc/format_converter.h"
 
-//#define communication_length 50 //number of clock cycles that the communication should last 
-static uint16_t clk_cycle = 0; //variable to save the current clock cycle, in order to know when to set the reset pin and when to start transmitting data
+static uint16_t clk_cycle = 0; //variable to save the current clock cycle, in order to know when to set the reset pin and when to start transmitting data	
 
-	
-	
-extern volatile uint8_t flag;
 extern volatile uint8_t wave_samples[];
 extern volatile uint8_t selection_flag;
 
@@ -61,12 +57,8 @@ void portClockInit(){ //Pin with the signal clock 10 (OC1B)
 }
 
 ISR(TIMER1_COMPB_vect){
-	//print_string_pooling("int/n",4);
-	//uint8_t *data_out = data_out_array;
-	///uint8_t *data_in = data_in_array;
-	//flag = 0;
+	
 	selection_flag = FILTER_DATA_FLAG;
-	//print_string_pooling("t\n",2); //DEBUG
 	
 }
 

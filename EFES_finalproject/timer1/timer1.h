@@ -11,5 +11,6 @@
 #define TIMER1_H_
 
 void fastPWMStart_T1(void);
+void disableTimer1(void);
 
 #endif /* TIMER1_H_ */

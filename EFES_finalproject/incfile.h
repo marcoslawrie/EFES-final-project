@@ -21,9 +21,9 @@
 /******** Signal filter defines *******/
 #define N_SAMPLES 500
 #define WAVE_SAMPLES_LENGTH (N_SAMPLES + N_TAPS - 1)
-#define N_TAPS 9
-#define HALF_N_TAPS 4
-#define PIPELINE_DEPTH 6
+#define N_TAPS 17
+#define HALF_N_TAPS 8
+#define PIPELINE_DEPTH 7
 
 
 /******** Sine wave parameters ********/

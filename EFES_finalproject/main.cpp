@@ -17,7 +17,7 @@
 #include "EEPROM/eeprom.h"
 #include "IncFile.h"
 
-//DELETE VOLATILE AFTER CHANGING CODE AND CHECKING THAT THE VARIABLE IS NOT MODIFIED DURING AN INTERRUPT
+
 uint8_t wave_samples[WAVE_SAMPLES_LENGTH]; //we add N taps-1 in order to do a circular convolution, so we obtain a complete cycle of the output signal ignoring
 //the fist output values when all the values of the filter are 0.
 
@@ -26,15 +26,9 @@ static uint8_t wave_selector = 0;
 static uint8_t data_in_memory = 0;
 volatile uint8_t selection_flag = 0;
 
-//#define LENGTH 15 // Length of the wave lookup table
-//uint8_t wave[LENGTH]; // Storage for waveform
-//uint8_t read_wave[LENGTH]; 
 
-
-volatile uint16_t counter = 0;
 volatile uint16_t count_timer0 = 0;
 volatile uint16_t PWM_duty_cycle = 0;
-volatile uint8_t flag=0;
 
 
 /*
@@ -103,11 +97,10 @@ void filter_data(void){
 			PORTD = ( 1UL << DDD0 ) | (PIND&0x0F) | ((wave_samples[clk_cycle-1] & 0x0F)<<4);//out a value MSB[PB4, PB1, PD7, PD6, PD5, PD4]LSB, Here I also assure that reset = '0'
 			PORTB = (PINB & 0xED) | ((wave_samples[clk_cycle-1] & 0x10)>>3) | ((wave_samples[clk_cycle-1] & 0x20)>>1); //(data_out & 0x20)= MSB of the data out, (data_out & 0x10)=MSB-1 of the data out	
 			
-			//uint16_t valor = (PINB & 0x20) | ((PINC & 0x3E)>>1);//clk_cycle-1-(N_TAPS+PIPELINE_DEPTH);//read an input value MSB[PB5, PC5, PC4, PC3, PC2, PC1]LSB
-			//volatile uint8_t value_sent = ((PINB & 0x10)<<1)|((PINB & 0x02)<<3)|((PIND & 0xF0)>>4);
+			
+			//volatile uint8_t sent_value = ((PINB & 0x10)<<1)|((PINB & 0x02)<<3)|((PIND & 0xF0)>>4);
 			char value[5]; //DEBUG
 			wave_samples[clk_cycle-1-(N_TAPS+PIPELINE_DEPTH)] = (PINB & 0x20) | ((PINC & 0x3E)>>1);//read an input value MSB[PB5, PC5, PC4, PC3, PC2, PC1]LSB
-			//int2str4dig(clk_cycle,value,1); //DEBUG
 			int2str4dig(wave_samples[clk_cycle-1-(N_TAPS+PIPELINE_DEPTH)],value,1); //DEBUG
 			clk_cycle++;
 			print_string_pooling(value,5); //DEBUG
@@ -148,7 +141,6 @@ void filter_data(void){
 		else{ 
 			TCCR1B = 0; //No clock source-> communication done, disable timer1 
 			clk_cycle = 0;
-			flag = 1;
 			EEPROM_update_batch(RX_SIGNAL_START_ADDRESS,wave_samples,N_SAMPLES);
 			print_string_pooling("writing new data\n",17); //DEBUG
 		}
@@ -158,31 +150,46 @@ void filter_data(void){
 	selection_flag = 0;
 }
 void pwm_out(void){
-	
+			//SINGLE READ OF ADC and INIT POWER PWM
+			uint16_t temp;
+			InitADCSingleReading(&temp);
+
+			SetADCChannel(0);
+			StartADC();
+			while(ADCSRA & (1<<ADSC)); //waiting for the conversion to finish
+			print_string_pooling("conversion done\n",16); //DEBUG
+			PWM_duty_cycle = temp;
+			
+			//Printing result of the conversion
+			char value[5];// DEBUG
+			int2str4dig(PWM_duty_cycle,value,1); //DEBUG
+			print_string_pooling(value,5);
+			
+			if(!((TCCR2A & (1 << WGM20))&& (TCCR2A & (1 << WGM21)))){ //see if PWM of timer 2 is already working or not
+				fastPWMStart_T2(); //PWM was not set up
+				disableTimer1();
+			}
+			setTOPValue(PWM_duty_cycle);
+			selection_flag = 0;
 }
 void analog_signal_out(void){
-	
-	print_string_pooling("SHOW ANALOG SIGNAL\n",19);// DEBUG
-		
-		
+			
 		DisableADC();
 		if(!wave_selector){
 			EEPROM_read_batch(TX_SIGNAL_START_ADDRESS, wave_samples,N_SAMPLES);
 			wave_selector = 1;
-			print_string_pooling("original signal\n",16);
+			print_string_pooling("Showing original signal\n",24);
 		}
 		else{
 			EEPROM_read_batch(RX_SIGNAL_START_ADDRESS, wave_samples,N_SAMPLES);
 			wave_selector = 0;
-			print_string_pooling("filtered signal\n",16);
+			print_string_pooling("Showing filtered signal\n",24);
 		}
-		/*for (int i=0; i<N_SAMPLES; i++) { // Step across wave table
-			float v = (AMP*(0.85*sin((PI2/N_SAMPLES)*i)+0.15*sin((KFO*PI2/N_SAMPLES)*i))); // Compute value
-			wave_samples[i] = uint8_t(v+OFFSET); // Store value as integer
-		}*/
+		print_string_pooling("SETTING EVERYTHING\n",18);
 		//Start PWM to show signal
 		fastPWMStart_T1();
 		timer2Init();
+		CTCMOdestart_T2();
 		timer2SetIntOnMatch();
 		selection_flag = 0;
 }
@@ -212,12 +219,11 @@ void generate_data(void){
 	
 	sei();
 	
-	//Initialize port and filter data
+	//Initialize port and filter data. Disable modules used for other porpuses 
 	DisableADC();
-	TCCR2B = 0; //disabling timer 2
+	timer2disableInterrupt();
+	disableTimer2();
 	parallelPortInit();
 	portClockInit();
-	//Save filtered data in memory I SHOULD DELETE THIS
-	//EEPROM_update_batch(RX_SIGNAL_START_ADDRESS,wave_samples,N_SAMPLES);
 	selection_flag = 0;
 }
